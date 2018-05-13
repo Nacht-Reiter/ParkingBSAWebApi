@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ParkingBSA;
 
 namespace ParkingBSAWebApi.Controllers
 {
@@ -11,36 +13,46 @@ namespace ParkingBSAWebApi.Controllers
     [Route("api/Transactions")]
     public class TransactionsController : Controller
     {
-        // GET: api/Transactions
+        private Parking _Parking { get; set; } = Parking.Instanse;
+
+        // GET: api/transactions
         [HttpGet]
-        public IEnumerable<string> Get()
+        public JsonResult Get()
         {
-            return new string[] { "value1", "value2" };
+            return Json(_Parking.TransactionsList);
         }
 
-        // GET: api/Transactions/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        // GET: api/transactions/5
+        [HttpGet("{id}")]
+        public ActionResult Get(string id)
         {
-            return "value";
+            try
+            {
+                return Json(_Parking.TransactionsList.Where<Transaction>(x => x.CarID == id));
+            }
+            catch (InvalidOperationException)
+            {
+                return StatusCode(404);
+            }
         }
-        
-        // POST: api/Transactions
-        [HttpPost]
-        public void Post([FromBody]string value)
+
+        // GET: api/transactions
+        [HttpGet("log")]
+        public ActionResult GetLog()
         {
+            try
+            {
+                using (StreamReader sr = new StreamReader("Transactions.log"))
+                {
+
+                    return Json(sr.ReadToEnd());
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                return StatusCode(404);
+            }
         }
-        
-        // PUT: api/Transactions/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-        
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+
     }
 }

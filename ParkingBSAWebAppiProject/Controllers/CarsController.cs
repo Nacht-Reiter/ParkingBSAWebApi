@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ParkingBSA;
 
 namespace ParkingBSAWebAppiProject.Controllers
 {
@@ -10,36 +12,67 @@ namespace ParkingBSAWebAppiProject.Controllers
     [Route("api/[controller]")]
     public class CarsController : Controller
     {
-        // GET api/values
+        private Parking _Parking { get; set; } = Parking.Instanse;
+
+        // GET api/cars
         [HttpGet]
-        public IEnumerable<string> Get()
+        public JsonResult Get()
         {
-            return new string[] { "value1", "value2" };
+            return Json(_Parking.CarsList);
         }
 
-        // GET api/values/5
+        // GET api/cars/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public ActionResult Get(string id)
         {
-            return "value";
+            try
+            {
+                return Json(_Parking.CarsList.Where<Car>(x => x.ID == id));
+            }
+            catch (InvalidOperationException)
+            {
+                return StatusCode(404);
+            }
         }
 
-        // POST api/values
+        // POST api/cars
         [HttpPost]
-        public void Post([FromBody]string value)
+        public StatusCodeResult Post([FromBody]Car car)
         {
+            if(car != null && car.Balance >= 0 && !string.IsNullOrWhiteSpace(car.ID))
+            {
+                _Parking.AddCar(car);
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(400);
+            }
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
 
-        // DELETE api/values/5
+        // DELETE api/cars/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public StatusCodeResult Delete(string id)
         {
+            try
+            {
+                Car car = _Parking.CarsList.Where(x => x.ID == id).First();
+
+                if (car.Balance >= 0)
+                {
+                    _Parking.RemoveCar(car);
+                    return StatusCode(200);
+                }
+                else
+                {
+                    return StatusCode(402);
+                }
         }
+            catch (InvalidOperationException)
+            {
+                return StatusCode(404);
+    }
+}
     }
 }

@@ -1,4 +1,7 @@
-﻿using System;
+﻿
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +10,7 @@ using System.Timers;
 
 namespace ParkingBSA
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum CarTypes
     {
         Passenger,

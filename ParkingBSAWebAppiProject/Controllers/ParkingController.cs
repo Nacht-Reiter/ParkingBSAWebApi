@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ParkingBSA;
 
 namespace ParkingBSAWebApi.Controllers
 {
@@ -11,36 +12,28 @@ namespace ParkingBSAWebApi.Controllers
     [Route("api/Parking")]
     public class ParkingController : Controller
     {
-        // GET: api/Parking
+        private Parking _Parking { get; set; } = Parking.Instanse;
+
+        // GET: api/parking
         [HttpGet]
-        public IEnumerable<string> Get()
+        public JsonResult Get()
         {
-            return new string[] { "value1", "value2" };
+            return Json(_Parking.CarsList.Count);
         }
 
-        // GET: api/Parking/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        // GET: api/parking/freespace
+        [HttpGet("freespace")]
+        public JsonResult GetFreeSpace()
         {
-            return "value";
+            return Json(_Parking.FreeSpace());
         }
-        
-        // POST: api/Parking
-        [HttpPost]
-        public void Post([FromBody]string value)
+
+        // GET: api/parking/balance
+        [HttpGet("balance")]
+        public JsonResult GetBalance()
         {
+            return Json(_Parking.Balance);
         }
-        
-        // PUT: api/Parking/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-        
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+
     }
 }
