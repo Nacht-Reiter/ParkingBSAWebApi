@@ -54,5 +54,20 @@ namespace ParkingBSAWebApi.Controllers
             }
         }
 
+        // PUT api/transactions/10
+        [HttpPut("{income}")]
+        public ActionResult Put(decimal income, [FromBody]Car car)
+        {
+            if (car == null)
+            {
+                return StatusCode(400); ;
+            }
+            _Parking.CarsList.Where<Car>(x => x.ID == car.ID).First().AddIncome(income);
+            return StatusCode(200);
+
+
+        }
+
+
     }
 }
