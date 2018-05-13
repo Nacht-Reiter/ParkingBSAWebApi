@@ -62,12 +62,15 @@ namespace ParkingBSAWebApi.Controllers
             {
                 return StatusCode(400); ;
             }
-            _Parking.CarsList.Where<Car>(x => x.ID == car.ID).First().AddIncome(income);
-            return StatusCode(200);
-
-
+            try
+            {
+                _Parking.CarsList.Where<Car>(x => x.ID == car.ID).First().AddIncome(income);
+                return StatusCode(200);
+            }
+            catch (InvalidOperationException)
+            {
+                return StatusCode(404);
+            }
         }
-
-
     }
 }
